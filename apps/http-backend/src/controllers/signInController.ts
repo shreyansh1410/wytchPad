@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { SignInSchema } from "@repo/common/types";
 
 export const signInController = (req: Request, res: Response) => {
   try {

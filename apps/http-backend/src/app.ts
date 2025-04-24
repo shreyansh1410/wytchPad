@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from "express";
 import { signUpController } from "./controllers/signUpController";
 import { signInController } from "./controllers/signInController";
