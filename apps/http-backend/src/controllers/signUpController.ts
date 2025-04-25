@@ -7,22 +7,12 @@ import { JWT_SECRET } from "@repo/backend-common/config";
 
 export const signUpController = async (req: Request, res: Response) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const { email, password } = req.body;
     let data;
-    if (lastName) {
-      data = signUpSchema.safeParse({
-        firstName,
-        lastName,
-        email,
-        password,
-      });
-    } else {
-      data = signUpSchema.safeParse({
-        firstName,
-        email,
-        password,
-      });
-    }
+    data = signUpSchema.safeParse({
+      email,
+      password,
+    });
     if (!data.success) {
       res.status(500).json({
         msg: "Invlaid registration inputs",
@@ -31,13 +21,11 @@ export const signUpController = async (req: Request, res: Response) => {
       return;
     }
 
-    const hashedPass = bcrypt.hash(password, 10);
+    const hashedPass = await bcrypt.hash(password, 10);
     await prisma.user.create({
       data: {
-        firstName,
-        lastName,
         email,
-        hashedPass,
+        password: hashedPass,
       },
     });
 
