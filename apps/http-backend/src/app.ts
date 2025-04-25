@@ -1,19 +1,15 @@
-import 'dotenv/config';
+import "dotenv/config";
 import express from "express";
-import { signUpController } from "./controllers/signUpController";
-import { signInController } from "./controllers/signInController";
-import { roomController } from "./controllers/roomController";
-import { middleware } from "./middlewares";
-
+import authRouter from "./routes/authRoutes";
+import roomRouter from "./routes/roomRoutes";
 const app = express();
 app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
 
-app.post("/signup", signUpController);
-app.post("/signin", signInController);
+app.use("/auth", authRouter);
 
-app.post("/room", middleware, roomController);
+app.use("/room", roomRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is listening at ${PORT}`);

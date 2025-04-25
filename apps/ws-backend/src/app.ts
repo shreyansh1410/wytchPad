@@ -3,6 +3,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { createRoomSchmea } from "@repo/common/types";
+import { prisma } from "@repo/db/client";
 
 const wss = new WebSocketServer({ port: 8080 });
 
@@ -22,6 +23,16 @@ wss.on("connection", (ws: WebSocket, request) => {
   }
   const userId = decoded.userId;
   ws.on("message", (message) => {
-    ws.send("pong");
+    try{
+      const data = JSON.parse(message.toString());
+      const res = createRoomSchmea.safeParse(data);
+      if (!res.success) {
+        ws.send(JSON.stringify({error: "Invalid room creation data"}));
+        return;
+      }
+      ws.send("pong");
+    }catch(err){
+      ws.send(JSON.stringify({error: "Internal server error in WS"}))
+    }
   });
 });
