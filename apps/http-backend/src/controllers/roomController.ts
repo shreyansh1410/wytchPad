@@ -27,6 +27,9 @@ export const roomController = async (req: Request, res: Response) => {
 
     const userId = req.userId;
     if (!userId) {
+      res.status(500).json({
+        msg: "user not authenticated",
+      });
       return;
     }
     const createdRoom = await prisma.room.create({
