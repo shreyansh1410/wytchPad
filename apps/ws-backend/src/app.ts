@@ -61,6 +61,8 @@ wss.on("connection", (ws: WebSocket, request) => {
       try {
         const data = JSON.parse(message.toString());
 
+        /*--------------------------------- */
+
         if (data.type === "join") {
           const room = await prisma.room.findFirst({
             where: { id: data.roomId },
@@ -72,15 +74,23 @@ wss.on("connection", (ws: WebSocket, request) => {
           const user = users.find((x) => x.ws === ws);
           user?.rooms.push(data.roomId);
           ws.send(JSON.stringify({ msg: `Joined room ${data.roomId}` }));
-        } else if (data.type === "leave") {
+        }
+
+        /*--------------------------------- */
+
+        if (data.type === "leave") {
           const user = users.find((x) => x.ws === ws);
           if (!user) return;
           user.rooms = user.rooms.filter((roomId) => roomId !== data.roomId);
           ws.send(JSON.stringify({ msg: `Left room ${data.roomId}` }));
-        } else if (data.type === "chat") {
+        }
+
+        /*--------------------------------- */
+
+        if (data.type === "chat") {
           //this is not a good approach since DB calls are slow and it will delay the
           //propagation of messages to others
-          const chat = await prisma.chat.create({
+          await prisma.chat.create({
             data: {
               roomId: data.roomId,
               message: data.message,
@@ -91,7 +101,7 @@ wss.on("connection", (ws: WebSocket, request) => {
           const message = data.message;
           users.forEach((user) => {
             if (user.rooms.includes(roomId)) {
-              user.ws.send(JSON.stringify({ msg: message }));
+              user.ws.send(JSON.stringify({ message: message, roomId }));
             }
           });
         } else {

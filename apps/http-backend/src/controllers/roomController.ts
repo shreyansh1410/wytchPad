@@ -49,3 +49,38 @@ export const roomController = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getRoomIdController = async (req: Request, res: Response) => {
+  const roomSlug = req.params.roomSlug;
+  if (!roomSlug) return;
+  const room = await prisma.room.findFirst({
+    where: {
+      slug: roomSlug,
+    },
+  });
+  if (!room) {
+    res.status(500).json({
+      msg: "room not found",
+    });
+    return;
+  }
+  res.status(200).json({
+    roomId: room.id,
+  });
+};
+
+export const getRoomByIdController = async (req: Request, res: Response) => {
+  const roomId = Number(req.params.roomId);
+  if (!roomId || isNaN(roomId)) {
+    res.status(400).json({ msg: "Invalid room id" });
+    return;
+  }
+  const room = await prisma.room.findUnique({
+    where: { id: roomId },
+  });
+  if (!room) {
+    res.status(404).json({ msg: "room not found" });
+    return;
+  }
+  res.status(200).json({ room });
+};
