@@ -11,7 +11,7 @@ export const middleware = (req: Request, res: Response, next: NextFunction) => {
       next();
     } else {
       res.status(403).json({
-        msg: "Unauthorised",
+        msg: "Middleware has blocked your access",
       });
     }
   } catch (err) {
