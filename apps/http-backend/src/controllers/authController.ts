@@ -5,54 +5,62 @@ import { prisma } from "@repo/db/client";
 import bcrypt from "bcrypt";
 import { JWT_SECRET } from "@repo/backend-common/config";
 
-export const signUpController = async (req: Request, res: Response) => {
+export const signUpController = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
   try {
     const { email, password } = req.body;
-    let data;
-    data = signUpSchema.safeParse({
+    const data = signUpSchema.safeParse({
       email,
       password,
     });
     if (!data.success) {
-      res.status(500).json({
-        msg: "Invlaid registration inputs",
+      return res.status(400).json({
+        msg: "Invalid registration inputs",
+        errors: data.error.errors,
       });
-      return;
     }
 
     const user = await prisma.user.findFirst({
-      where: {
-        email: email,
-      },
+      where: { email },
     });
     if (user) {
-      res.status(500).json({
+      return res.status(409).json({
         msg: "Email is already in use",
       });
-      return;
     }
 
     const hashedPass = await bcrypt.hash(password, 10);
-    await prisma.user.create({
+    const createdUser = await prisma.user.create({
       data: {
         email,
         password: hashedPass,
       },
     });
 
-    const token = jwt.sign({ email }, JWT_SECRET);
-    res.status(200).json({
+    const token = jwt.sign(
+      { email: createdUser.email, id: createdUser.id },
+      JWT_SECRET!
+    );
+    return res.status(201).json({
+      msg: "User created successfully",
       token,
+      user: { email: createdUser.email, id: createdUser.id },
     });
   } catch (err) {
-    res.status(500).json({
+    console.error("Signup error:", err);
+    return res.status(500).json({
       msg: "Error signing up",
-      err,
+      error: err instanceof Error ? err.message : err,
     });
   }
 };
 
-export const signInController = async (req: Request, res: Response) => {
+export const signInController = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
   try {
     const { email, password } = req.body;
     const data = signInSchema.safeParse({
@@ -60,10 +68,10 @@ export const signInController = async (req: Request, res: Response) => {
       password,
     });
     if (!data.success) {
-      res.status(500).json({
+      return res.status(400).json({
         msg: "Invalid sign in credentials",
+        errors: data.error.errors,
       });
-      return;
     }
     const user = await prisma.user.findFirst({
       where: {
@@ -72,35 +80,35 @@ export const signInController = async (req: Request, res: Response) => {
       select: {
         email: true,
         password: true,
+        id: true,
       },
     });
 
     if (!user) {
-      res.status(403).json({
+      return res.status(403).json({
         msg: "Incorrect email",
       });
-      return;
     }
 
     const decodedpass = await bcrypt.compare(password, user.password);
     if (!decodedpass) {
-      res.status(403).json({
+      return res.status(403).json({
         msg: "Incorrect Password",
       });
-      return;
     }
 
-    const token = jwt.sign({ email }, JWT_SECRET);
+    const token = jwt.sign({ email: user.email, id: user.id }, JWT_SECRET!);
 
-    res.status(200).json({
+    return res.status(200).json({
       msg: "signed in successfully",
       token,
+      user: { email: user.email, id: user.id },
     });
-    return;
   } catch (err) {
-    res.status(500).json({
+    console.error("Signin error:", err);
+    return res.status(500).json({
       msg: "error signing in user",
-      err,
+      error: err instanceof Error ? err.message : err,
     });
   }
 };
