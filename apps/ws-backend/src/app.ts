@@ -20,7 +20,7 @@ wss.on("connection", (ws: WebSocket, request) => {
     ws.close();
     return;
   }
-
+  const userId = decoded.userId;
   ws.on("message", (message) => {
     ws.send("pong");
   });

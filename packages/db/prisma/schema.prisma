@@ -8,22 +8,31 @@ datasource db {
 }
 
 model User{
-  id Int @id @default(autoincrement()) @unique
+  id String @id @default(uuid())
   firstName String
   lastName String?
   email String @unique
   password String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
+  rooms Room[]
+  chats Chat[]
 }
 
 model Room{
-  id Int @id @default(autoincrement()) @unique
-  roomdId String @unique
+  id Int @id @default(autoincrement())
+  slug String @unique
+  createdAt DateTime @default(now())
+  adminId String
+  admin User @relation(fields: [adminId], references: [id])
+  chats Chat[]
 }
 
 model Chat{
-  id Int @id @default(autoincrement()) @unique
-  userId String[]
-
+  id Int @id @default(autoincrement())
+  message String
+  userId String
+  roomId Int
+  room Room @relation(fields: [roomId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
