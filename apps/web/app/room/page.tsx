@@ -17,7 +17,6 @@ export default function RoomEntryPage() {
     }
     setLoading(true);
     try {
-      // Redirect to /room/[slug] for SSR room lookup and further redirect
       router.push(`/room/${slug}`);
     } catch (err: any) {
       setError("Failed to join room");

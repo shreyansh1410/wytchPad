@@ -1,36 +1,34 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { BACKEND_URL } from "../../config";
+import axios from "axios";
 
 export default function SigninPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const router = useRouter();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     try {
-      const res = await fetch("http://localhost:3001/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.msg || "Sign in failed");
+      const res = await axios.post(`${BACKEND_URL}/auth/signin`, form);
+      const data = res.data;
       localStorage.setItem("token", data.token);
-      if (typeof window !== "undefined") {
-        import("axios").then(axios => {
-          axios.default.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-        });
-      }
+      axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
       router.push("/room");
     } catch (err: any) {
-      setError(err.message);
+      console.error("Sign in error:", err);
+      setError(err.response?.data?.msg || err.message || "Sign in failed");
+      localStorage.removeItem("token");
     }
   };
+
   return (
     <div
       style={{

@@ -11,7 +11,6 @@ export default function RoomSlug({ params }: { params: Promise<{ slug: string }>
   useEffect(() => {
     async function fetchAndRedirect() {
       try {
-        console.log(slug);
         const res = await axios.get(`${BACKEND_URL}/room/${slug}`);
         if (res.data && res.data.roomId) {
           router.replace(`/room/id/${res.data.roomId}`);
