@@ -3,25 +3,56 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function RoomEntryPage() {
-  const [slug, setSlug] = useState("");
+  const [roomName, setRoomName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [createRoomLoading, setCreateRoomLoading] = useState(false);
   const router = useRouter();
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!slug) {
-      setError("Room slug is required");
+    if (!roomName) {
+      setError("Room name is required");
       return;
     }
     setLoading(true);
     try {
-      router.push(`/room/${slug}`);
+      router.push(`/room/${roomName}`);
     } catch (err: any) {
       setError("Failed to join room");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateRoom = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (!roomName) {
+      setError("Room name is required");
+      return;
+    }
+    setCreateRoomLoading(true);
+    try {
+      const res = await fetch("/api/room/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomName }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.msg || "Failed to create room");
+      } else {
+        alert("Room created successfully!");
+        setRoomName("");
+        // Optionally, navigate to the room
+        // router.push(`/room/${roomName}`);
+      }
+    } catch (err) {
+      setError("Failed to create room");
+    } finally {
+      setCreateRoomLoading(false);
     }
   };
 
@@ -36,7 +67,6 @@ export default function RoomEntryPage() {
       }}
     >
       <form
-        onSubmit={handleJoin}
         style={{
           background: "#181a1b",
           borderRadius: 18,
@@ -57,14 +87,14 @@ export default function RoomEntryPage() {
             textAlign: "center",
           }}
         >
-          Enter a Room
+          Enter or Create a Room
         </h2>
         <label style={{ color: "#cfd8dc", fontWeight: 500, marginBottom: 4 }}>
-          Room Slug <span style={{ color: "#fff" }}>*</span>
+          Room Name <span style={{ color: "#fff" }}>*</span>
           <input
-            placeholder="Room slug"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
+            placeholder="Room name"
+            value={roomName}
+            onChange={(e) => setRoomName(e.target.value)}
             required
             style={{
               background: "#23272a",
@@ -83,27 +113,52 @@ export default function RoomEntryPage() {
         {error && (
           <div style={{ color: "#e57373", marginTop: 8, textAlign: "center" }}>{error}</div>
         )}
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            background: "#fff",
-            color: "#000",
-            border: "none",
-            borderRadius: 8,
-            padding: "0.75rem 0",
-            fontWeight: 700,
-            fontSize: 18,
-            marginTop: 6,
-            cursor: loading ? "not-allowed" : "pointer",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-            transition: "background 0.2s",
-            fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
-            opacity: loading ? 0.7 : 1,
-          }}
-        >
-          {loading ? "Joining..." : "Join Room"}
-        </button>
+        <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={handleJoin}
+            style={{
+              flex: 1,
+              background: "#fff",
+              color: "#000",
+              border: "none",
+              borderRadius: 8,
+              padding: "0.75rem 0",
+              fontWeight: 700,
+              fontSize: 18,
+              cursor: loading ? "not-allowed" : "pointer",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              transition: "background 0.2s",
+              fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
+              opacity: loading ? 0.7 : 1,
+            }}
+          >
+            {loading ? "Joining..." : "Join Room"}
+          </button>
+          <button
+            type="button"
+            disabled={createRoomLoading}
+            onClick={handleCreateRoom}
+            style={{
+              flex: 1,
+              background: "#fff",
+              color: "#000",
+              border: "none",
+              borderRadius: 8,
+              padding: "0.75rem 0",
+              fontWeight: 700,
+              fontSize: 18,
+              cursor: createRoomLoading ? "not-allowed" : "pointer",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              transition: "background 0.2s",
+              fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
+              opacity: createRoomLoading ? 0.7 : 1,
+            }}
+          >
+            {createRoomLoading ? "Creating..." : "Create Room"}
+          </button>
+        </div>
       </form>
     </div>
   );
