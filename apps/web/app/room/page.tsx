@@ -18,7 +18,8 @@ export default function RoomEntryPage() {
     }
     setLoading(true);
     try {
-      router.push(`/room/${roomName}`);
+      const roomId = await fetch(`/api/room/${roomName}`);
+      router.push(`/room/${roomId}`);
     } catch (err: any) {
       setError("Failed to join room");
     } finally {
@@ -111,7 +112,9 @@ export default function RoomEntryPage() {
           />
         </label>
         {error && (
-          <div style={{ color: "#e57373", marginTop: 8, textAlign: "center" }}>{error}</div>
+          <div style={{ color: "#e57373", marginTop: 8, textAlign: "center" }}>
+            {error}
+          </div>
         )}
         <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
           <button

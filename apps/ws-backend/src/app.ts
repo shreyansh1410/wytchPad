@@ -74,7 +74,6 @@ wss.on("connection", (ws: WebSocket, request) => {
     authenticated = true;
     const userId = user.id;
 
-    // Add the new connection without removing existing ones
     const userConnection: User = {
       ws,
       userId,
@@ -158,8 +157,6 @@ wss.on("connection", (ws: WebSocket, request) => {
             roomId: roomId,
             userId: userId,
           });
-
-          // Get all users in this room and broadcast
           users
             .filter((u) => u.rooms.includes(roomId))
             .forEach((user) => {
@@ -181,14 +178,13 @@ wss.on("connection", (ws: WebSocket, request) => {
           })
         );
       }
+      return;
     });
 
-    // Handle client disconnection
     ws.on("close", () => {
       users = users.filter((user) => user.ws !== ws);
     });
 
-    // Handle errors
     ws.on("error", (error) => {
       console.error("WebSocket error:", error);
       try {
@@ -197,21 +193,15 @@ wss.on("connection", (ws: WebSocket, request) => {
         // Ignore error if socket is already closed
       }
     });
-
-    // Send initial connection success message
-    ws.send(JSON.stringify({ type: "connect", success: true }));
   } catch (err) {
     console.error("WS Connection error:", err);
-    try {
-      ws.send(
-        JSON.stringify({
-          type: "error",
-          message: "Internal server error on connect",
-        })
-      );
-      ws.close(1011, "Internal error");
-    } catch {
-      // Ignore error if socket is already closed
-    }
+
+    ws.send(
+      JSON.stringify({
+        type: "error",
+        message: "Internal server error on connect",
+      })
+    );
+    ws.close(1011, "Internal error");
   }
 });

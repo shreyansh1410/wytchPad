@@ -3,9 +3,9 @@ import { prisma } from "@repo/db/client";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ roomId: string }> }
+  { params }: { params: { roomId: string } }
 ) {
-  const { roomId } = await params;
+  const roomId = (await params).roomId;
   const roomIdNum = Number(roomId);
   if (!roomIdNum || isNaN(roomIdNum)) {
     return NextResponse.json({ msg: "Invalid room id" }, { status: 400 });
@@ -17,6 +17,7 @@ export async function GET(
     });
 
     if (!room) {
+      console.log("Room not found for id:", roomIdNum);
       return NextResponse.json({ msg: "room not found" }, { status: 404 });
     }
 
