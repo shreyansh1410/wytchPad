@@ -12,10 +12,10 @@ const fetcher = (url: string) => {
 
 export default function RoomDashboardPage() {
   const router = useRouter();
-  const { data, error, isLoading, mutate } = useSWR("/api/room/my", fetcher);
+  const { data, error, isLoading } = useSWR("/api/room/my", fetcher);
 
   const handleJoin = (roomId: number) => {
-    router.push(`/room/${roomId}`);
+    router.push(`/canvas/${roomId}`);
   };
 
   const handleCreateRoom = () => {
