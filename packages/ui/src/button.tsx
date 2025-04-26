@@ -21,18 +21,18 @@ export const Button = ({
       onClick={() => appName && alert(`Hello from your ${appName} app!`)}
       disabled={loading}
       style={{
-        background: '#5865f2',
-        color: '#fff',
+        background: "#fff",
+        color: "#000",
         fontWeight: 600,
-        border: 'none',
+        border: "none",
         borderRadius: 8,
-        padding: '0.75rem 1.5rem',
+        padding: "0.75rem 1.5rem",
         fontSize: 16,
         marginTop: 12,
-        cursor: loading ? 'not-allowed' : 'pointer',
+        cursor: loading ? "not-allowed" : "pointer",
         opacity: loading ? 0.7 : 1,
-        transition: 'opacity 0.2s',
-        ...(!loading && { boxShadow: '0 2px 8px rgba(88,101,242,0.12)' }),
+        transition: "opacity 0.2s",
+        ...(!loading && { boxShadow: "0 2px 8px rgba(88,101,242,0.12)" }),
       }}
     >
       {children}

@@ -41,8 +41,8 @@ export default function Home() {
           <Link
             href="/auth/signup"
             style={{
-              background: "#64b5f6",
-              color: "#fff",
+              background: "#fff",
+              color: "#000",
               padding: "0.75rem 2rem",
               borderRadius: 8,
               fontWeight: 600,

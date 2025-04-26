@@ -9,7 +9,8 @@ export default function Header() {
       fontWeight: 700,
       fontSize: "2.5rem",
       background: "rgba(0,0,0,0.15)",
-      boxShadow: "0 2px 8px rgba(0,0,0,0.04)"
+      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+      color: "#64b5f6"
     }}>
       WytchPad
     </header>
