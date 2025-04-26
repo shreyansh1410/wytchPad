@@ -46,16 +46,31 @@ export default function RoomIdPage({
     <div
       style={{
         display: "flex",
-        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         height: "100vh",
-        color: "#fff",
+        background: "#0a0a0a",
       }}
     >
-      <div style={{ padding: "20px", borderBottom: "1px solid #333" }}>
-        <h2>Room: {room.slug}</h2>
-      </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        <ChatClient messages={chats} roomId={id} />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: 420,
+          height: 600,
+          background: "#18191a",
+          borderRadius: 18,
+          boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+          overflow: "hidden",
+          color: "#fff",
+        }}
+      >
+        <div style={{ padding: "20px", borderBottom: "1px solid #333" }}>
+          <h2 style={{ margin: 0 }}>Room: {room.slug}</h2>
+        </div>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+          <ChatClient messages={chats} roomId={id} />
+        </div>
       </div>
     </div>
   );

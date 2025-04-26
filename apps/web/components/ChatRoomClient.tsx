@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSocket } from "../hooks/useSocket";
 
 export function ChatClient({
@@ -13,6 +13,7 @@ export function ChatClient({
   const [chats, setChats] = useState(messages);
   const [newMessage, setNewMessage] = useState("");
   const { socket, loading } = useSocket();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!socket || loading) return;
@@ -41,6 +42,11 @@ export function ChatClient({
     };
   }, [socket, loading, roomId]);
 
+  useEffect(() => {
+    // Auto-scroll to bottom when chats change
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chats]);
+
   const sendMessage = () => {
     if (!socket || !newMessage.trim()) return;
 
@@ -61,6 +67,7 @@ export function ChatClient({
         flexDirection: "column",
         height: "100%",
         background: "#121212",
+        minHeight: 0,
       }}
     >
       {loading && (
@@ -75,7 +82,7 @@ export function ChatClient({
           Connecting to chat...
         </div>
       )}
-      <div style={{ flex: 1, overflowY: "auto", padding: 16 }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: 16, minHeight: 0, maxHeight: "calc(100vh - 180px)" }}>
         {chats.map((chat, index) => (
           <div
             key={index}
@@ -88,6 +95,7 @@ export function ChatClient({
             {chat}
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
       <div
         style={{
@@ -95,6 +103,10 @@ export function ChatClient({
           gap: 12,
           padding: 16,
           borderTop: "1px solid #333",
+          background: "#121212",
+          position: "sticky",
+          bottom: 0,
+          zIndex: 10,
         }}
       >
         <input
