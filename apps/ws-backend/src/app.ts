@@ -25,11 +25,9 @@ function checkUser(token: string): { id: string; email?: string } | null {
   }
 }
 
-// Clean up function to remove disconnected users
 function cleanupDisconnectedUsers() {
   users = users.filter((user) => {
     try {
-      // Check if the WebSocket is still alive
       user.ws.ping();
       return true;
     } catch {
@@ -40,7 +38,6 @@ function cleanupDisconnectedUsers() {
 
 const wss = new WebSocketServer({ port: 8080 });
 
-// Periodically clean up disconnected users
 setInterval(cleanupDisconnectedUsers, 30000);
 
 wss.on("connection", (ws: WebSocket, request) => {
@@ -166,6 +163,64 @@ wss.on("connection", (ws: WebSocket, request) => {
                 }
               } catch (error) {
                 console.error("Error sending message to user:", error);
+              }
+            });
+        } else if (data.type === "delete") {
+          const roomId = parseInt(data.roomId, 10);
+          if (isNaN(roomId)) {
+            ws.send(
+              JSON.stringify({
+                type: "error",
+                message: "Invalid room ID format",
+              })
+            );
+            return;
+          }
+
+          const currentUser = users.find((x) => x.ws === ws);
+          if (!currentUser || !currentUser.rooms.includes(roomId)) {
+            ws.send(
+              JSON.stringify({
+                type: "error",
+                message: "Not joined to this room",
+              })
+            );
+            return;
+          }
+          const shapeStr = data.message;
+          const chatToDelete = await prisma.chat.findFirst({
+            where: {
+              roomId: roomId,
+              message: shapeStr,
+            },
+          });
+
+          if (!chatToDelete) {
+            ws.send(
+              JSON.stringify({
+                type: "error",
+                message: "Shape not found for deletion",
+              })
+            );
+            return;
+          }
+
+          await prisma.chat.delete({ where: { id: chatToDelete.id } });
+
+          const deleteData = JSON.stringify({
+            type: "delete",
+            message: shapeStr,
+            roomId: roomId,
+          });
+          users
+            .filter((u) => u.rooms.includes(roomId))
+            .forEach((user) => {
+              try {
+                if (user.ws.readyState === WebSocket.OPEN) {
+                  user.ws.send(deleteData);
+                }
+              } catch (error) {
+                console.error("Error sending delete to user:", error);
               }
             });
         }

@@ -8,6 +8,7 @@ enum Tool {
   Pencil,
   Rectangle,
   Circle,
+  Eraser,
 }
 export { Tool };
 
@@ -53,6 +54,23 @@ const CircleIcon = () => (
     strokeLinejoin="round"
   >
     <circle cx="12" cy="12" r="10" />
+  </svg>
+);
+
+const EraserIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="17" width="18" height="4" rx="2" />
+    <path d="M5 17L19 7" />
+    <rect x="7" y="3" width="10" height="8" rx="2" />
   </svg>
 );
 
@@ -131,6 +149,11 @@ function TopBar({
         activated={selectedTool === Tool.Circle}
         icon={<CircleIcon />}
         onClick={() => setSelectedTool(Tool.Circle)}
+      />
+      <IconButton
+        activated={selectedTool === Tool.Eraser}
+        icon={<EraserIcon />}
+        onClick={() => setSelectedTool(Tool.Eraser)}
       />
     </div>
   );
