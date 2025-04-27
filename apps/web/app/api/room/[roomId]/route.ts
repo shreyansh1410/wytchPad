@@ -3,9 +3,9 @@ import { prisma } from "@repo/db/client";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { roomId: string } }
+  { params }: { params: Promise<{ roomId: string }> }
 ) {
-  const roomId = (await params).roomId;
+  const { roomId } = await params;
   const roomIdNum = Number(roomId);
   if (!roomIdNum || isNaN(roomIdNum)) {
     return NextResponse.json({ msg: "Invalid room id" }, { status: 400 });
