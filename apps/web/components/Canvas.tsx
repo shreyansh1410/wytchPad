@@ -86,8 +86,8 @@ export default function Canvas({
       <TopBar selectedTool={selectedTool} setSelectedTool={setSelectedTool} />
       <canvas
         ref={canvasRef}
-        width={1500}
-        height={600}
+        width={window.innerWidth}
+        height={window.innerHeight}
         style={{
           display: "block",
           width: "100vw",

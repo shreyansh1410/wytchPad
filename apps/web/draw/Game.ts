@@ -83,32 +83,28 @@ export class Game {
     this.ctx.fillStyle = "rgba(0, 0, 0)";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.strokeStyle = "rgba(255, 255, 255)";
-    this.rectangles.forEach((rect) => {
-      this.ctx!.strokeRect(rect.x, rect.y, rect.width, rect.height);
-    });
+
+    // Draw all saved shapes
     this.existingShapes.forEach((shape) => {
-      if (shape.type === "circle" && shape.radius > 0) {
+      if (shape.type === "rect") {
+        this.ctx!.strokeRect(shape.x, shape.y, shape.width, shape.height);
+      } else if (shape.type === "circle" && shape.radius > 0) {
         this.ctx!.beginPath();
-        this.ctx!.arc(
-          shape.centerX,
-          shape.centerY,
-          shape.radius,
-          0,
-          Math.PI * 2
-        );
+        this.ctx!.arc(shape.centerX, shape.centerY, shape.radius, 0, Math.PI * 2);
         this.ctx!.stroke();
         this.ctx!.closePath();
       }
     });
-    if (this.currentRect) {
+
+    // Draw only the preview for the current tool
+    if (this.selectedTool === Tool.Rectangle && this.currentRect) {
       this.ctx!.strokeRect(
         this.currentRect.x,
         this.currentRect.y,
         this.currentRect.width,
         this.currentRect.height
       );
-    }
-    if (this.currentCircle && this.currentCircle.radius > 0) {
+    } else if (this.selectedTool === Tool.Circle && this.currentCircle && this.currentCircle.radius > 0) {
       this.ctx!.beginPath();
       this.ctx!.arc(
         this.currentCircle.centerX,
@@ -242,5 +238,14 @@ export class Game {
 
   public setTool(tool: Tool) {
     this.selectedTool = tool;
+  }
+
+  public destroy() {
+    this.canvas.removeEventListener("mousedown", this.handleMouseDown);
+    this.canvas.removeEventListener("mousemove", this.handleMouseMove);
+    this.canvas.removeEventListener("mouseup", this.handleMouseUp);
+    if (this.socket) {
+      this.socket.onmessage = null;
+    }
   }
 }

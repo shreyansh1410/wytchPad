@@ -29,11 +29,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable}`}
         style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
       >
-        <Header />
         <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
           {children}
         </div>
-        <Footer />
       </body>
     </html>
   );

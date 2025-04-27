@@ -12,7 +12,7 @@ export function useSocket() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/auth/signin");
+      router.push("/signin");
       return;
     }
 
@@ -25,17 +25,11 @@ export function useSocket() {
 
     ws.onclose = (event) => {
       if (event.code === 1008) {
-        router.push("/auth/signin");
+        router.push("/signin");
       }
       setSocket(null);
       setLoading(true);
     };
-
-    // ws.onerror = (error) => {
-    //   console.error("WebSocket error:", error);
-    //   setSocket(null);
-    //   setLoading(true);
-    // };
 
     return () => {
       ws.close();
